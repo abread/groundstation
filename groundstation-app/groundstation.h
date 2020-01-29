@@ -22,14 +22,14 @@ public:
 
     void stop();
 
-    int16_t rssi();
+    int rssi();
     QList<DataLine> data();
 
 public slots:
     void process();
 
 signals:
-    void rssiUpdate(int16_t rssi);
+    void rssiUpdate(int rssi);
     void dataReady();
     void error(QString msg);
     void warning(QString msg);
@@ -38,14 +38,14 @@ signals:
 private:
     void processInput();
     void pushData(QByteArray data);
-    void setRSSI(int16_t rssi);
+    void setRSSI(int rssi);
     bool shouldStop();
 
     QSerialPort *_port;
     QFile *_outputFile;
     QByteArray _inputBuffer;
 
-    int16_t _rssi;
+    int _rssi;
     QMutex _rssiMutex;
 
     QList<DataLine> _outputBuffer;

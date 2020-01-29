@@ -24,7 +24,7 @@ public slots:
 private slots:
     void showWarning(QString msg);
     void showError(QString msg);
-    void updateRSSI(int16_t rssi);
+    void updateRSSI(int rssi);
     void pollData();
 
 private:

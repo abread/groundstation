@@ -29,7 +29,7 @@ DataWindow::DataWindow(GroundStation *g, QWidget *parent) :
     stationThread->start();
 }
 
-void DataWindow::updateRSSI(int16_t rssi) {
+void DataWindow::updateRSSI(int rssi) {
     ui->label_rssi->setNum(rssi);
 }
 

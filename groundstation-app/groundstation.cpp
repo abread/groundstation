@@ -49,6 +49,7 @@ void GroundStation::processInput() {
             if (line.startsWith("rssi: ")) {
                 line.chop(1); // remove \n
                 line = line.right(line.length() - 6);
+                setRSSI(line.toInt());
             } else {
                 if (line.startsWith("data: ")) {
                     line = line.right(line.length() - 6);
@@ -84,7 +85,7 @@ void GroundStation::pushData(QByteArray data) {
     emit dataReady();
 }
 
-void GroundStation::setRSSI(int16_t rssi) {
+void GroundStation::setRSSI(int rssi) {
     _rssiMutex.lock();
     _rssi = rssi;
     _rssiMutex.unlock();
@@ -92,7 +93,7 @@ void GroundStation::setRSSI(int16_t rssi) {
     emit rssiUpdate(rssi);
 }
 
-int16_t GroundStation::rssi() {
+int GroundStation::rssi() {
     QMutexLocker lock(&_rssiMutex);
     return _rssi;
 }
