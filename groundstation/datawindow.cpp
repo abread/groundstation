@@ -48,7 +48,7 @@ void DataWindow::pollData() {
     ui->label_numReceived->setNum(numRead);
 
     if (_autoscroll) {
-        ui->textEdit_data->scroll(0, data.length());
+        ui->textEdit_data->ensureCursorVisible();
     }
 }
 
