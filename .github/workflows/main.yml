@@ -12,11 +12,14 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
           - os: ubuntu-latest
-            artifact: groundstation-app-linux-amd64
+            artifact_path: groundstation-app/groundstation-app
+            artifact_name: groundstation-app-linux-amd64
           - os: windows-latest
-            artifact: groundstation-app-windows-ia64
+            artifact_path: groundstation-app/release/groundstation-app.exe
+            artifact_name: groundstation-app-windows-msvc-amd64
           - os: macOS-latest
-            artifact: groundstation-app.app.zip
+            artifact_path: groundstation-app/groundstation-app.app.zip
+            artifact_name: groundstation-app-macos-amd64.zip
     steps:
     - uses: actions/checkout@v2
     - name: Install Qt
@@ -39,28 +42,13 @@ jobs:
         qmake groundstation-app.pro -spec win32-msvc
         nmake
       if: matrix.os == 'windows-latest'
-    - name: Prepare artifacts (Linux)
-      run: |
-        cd groundstation-app
-        mv groundstation-app ../${{ matrix.artifact }}
-      if: matrix.os == 'ubuntu-latest'
     - name: Prepare artifacts (macOS)
       run: |
         cd groundstation-app
         zip -r ../${{ matrix.artifact }} groundstation-app.app
       if: matrix.os == 'macOS-latest'
-    - name: Prepare artifacts (Windows)
-      run: |
-         cd groundstation-app
-         dir release
-         mv release/groundstation-app.exe ../${{ matrix.artifact }}
-      if: matrix.os == 'windows-latest'
-    - name: Release
-      uses: yakuhzi/action-release@v1.2.0
+    - name: Publish artifact
+      uses: actions/upload-artifact@v1
       with:
-        # File to upload to the release
-        file: ${{ matrix.artifact }}
-      env:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-      if: startsWith(github.ref, 'refs/tags/')
-
+        name: ${{ matrix.artifact_name }}
+        path: ${{ matrix.artifact_path }}
