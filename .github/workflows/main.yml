@@ -24,13 +24,20 @@ jobs:
       with:
         # Additional Qt modules to install
         modules: qtserialport
-    - name: Build
+    - name: Build (*nix)
       run: |
         cd groundstation-app
         qmake groundstation-app.pro
         make qmake_all
         make
-        mv groundstation-app groundstation-app-suffix-${{ matrix.suffix }}
+        mv groundstation-app ../groundstation-app-${{ matrix.suffix }}
+    - name: Build (Windows)
+      run: |
+        cd groundstation-app
+        qmake groundstation-app.pro
+        nmake
+        dir
+        mv groundstation-app.exe ../../groundstation-app-${{ matrix.suffix }}.exe
     - name: Release
       uses: yakuhzi/action-release@v1.2.0
       with:
