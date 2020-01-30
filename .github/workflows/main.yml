@@ -40,13 +40,19 @@ jobs:
         mv groundstation-app.exe ../../groundstation-app-${{ matrix.suffix }}.exe
       if: matrix.os == 'windows-latest'
     - name: Prepare artifacts (Linux)
-      run: mv groundstation-app ../${{ matrix.artifact }}
+      run: |
+        cd groundstation-app
+        mv groundstation-app ../${{ matrix.artifact }}
       if: matrix.os == 'ubuntu-latest'
     - name: Prepare artifacts (macOS)
-      run: zip -r ../${{ matrix.artifact }} groundstation-app.app
+      run: |
+        cd groundstation-app
+        zip -r ../${{ matrix.artifact }} groundstation-app.app
       if: matrix.os == 'macOS-latest'
     - name: Prepare artifacts (Windows)
-      run: mv groundstation-app ../${{ matrix.artifact}}
+      run: |
+         cd groundstation-app
+         mv groundstation-app ../${{ matrix.artifact}}
       if: matrix.os == 'windows-latest'
     - name: Release
       uses: yakuhzi/action-release@v1.2.0
