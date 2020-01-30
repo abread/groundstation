@@ -38,8 +38,6 @@ jobs:
         cd groundstation-app
         qmake groundstation-app.pro -spec win32-msvc
         nmake
-        dir
-        mv groundstation-app.exe ../../groundstation-app-${{ matrix.suffix }}.exe
       if: matrix.os == 'windows-latest'
     - name: Prepare artifacts (Linux)
       run: |
@@ -54,7 +52,8 @@ jobs:
     - name: Prepare artifacts (Windows)
       run: |
          cd groundstation-app
-         mv groundstation-app ../${{ matrix.artifact}}
+         dir release
+         mv release/groundstation-app.exe ../${{ matrix.artifact }}
       if: matrix.os == 'windows-latest'
     - name: Release
       uses: yakuhzi/action-release@v1.2.0
