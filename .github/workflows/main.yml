@@ -12,12 +12,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
           - os: ubuntu-latest
-            suffix: linux-amd64
+            artifact: groundstation-app-linux-amd64
           - os: windows-latest
-            suffix: windows-amd64
+            artifact: groundstation-app-windows-ia64
           - os: macOS-latest
-            suffix: macos
-
+            artifact: groundstation-app.app.zip
     steps:
     - uses: actions/checkout@v2
     - name: Install Qt
@@ -31,7 +30,6 @@ jobs:
         qmake groundstation-app.pro
         make qmake_all
         make
-        mv groundstation-app ../groundstation-app-${{ matrix.suffix }}
       if: matrix.os != 'windows-latest'
     - name: Build (Windows)
       run: |
@@ -41,11 +39,20 @@ jobs:
         dir
         mv groundstation-app.exe ../../groundstation-app-${{ matrix.suffix }}.exe
       if: matrix.os == 'windows-latest'
+    - name: Prepare artifacts (Linux)
+      run: mv groundstation-app ../${{ matrix.artifact }}
+      if: matrix.os == 'ubuntu-latest'
+    - name: Prepare artifacts (macOS)
+      run: zip -r ../${{ matrix.artifact }} groundstation-app.app
+      if: matrix.os == 'macOS-latest'
+    - name: Prepare artifacts (Windows)
+      run: mv groundstation-app ../${{ matrix.artifact}}
+      if: matrix.os == 'windows-latest'
     - name: Release
       uses: yakuhzi/action-release@v1.2.0
       with:
         # File to upload to the release
-        file: groundstation-app-${{ matrix.suffix }}
+        file: ${{ matrix.artifact }}
       env:
         GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
       if: github.event == 'release'
