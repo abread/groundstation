@@ -18,7 +18,7 @@ jobs:
             artifact_path: groundstation-app/release/groundstation-app.exe
             artifact_name: groundstation-app-windows-msvc-amd64
           - os: macOS-latest
-            artifact_path: groundstation-app/groundstation-app.app.zip
+            artifact_path: groundstation-app/groundstation-app.app
             artifact_name: groundstation-app-macos-amd64.zip
     steps:
     - uses: actions/checkout@v2
@@ -42,11 +42,6 @@ jobs:
         qmake groundstation-app.pro -spec win32-msvc
         nmake
       if: matrix.os == 'windows-latest'
-    - name: Prepare artifacts (macOS)
-      run: |
-        cd groundstation-app
-        zip -r ../${{ matrix.artifact }} groundstation-app.app
-      if: matrix.os == 'macOS-latest'
     - name: Publish artifact
       uses: actions/upload-artifact@v1
       with:
