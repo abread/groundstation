@@ -31,11 +31,15 @@ jobs:
         make qmake_all
         make
       if: matrix.os != 'windows-latest'
+    - name: Prepare build environment (Windows)
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 15.XX
     - name: Build (Windows)
       run: |
         cd groundstation-app
         qmake groundstation-app.pro -spec win32-msvc
-        jom
+        nmake
         dir
         mv groundstation-app.exe ../../groundstation-app-${{ matrix.suffix }}.exe
       if: matrix.os == 'windows-latest'
