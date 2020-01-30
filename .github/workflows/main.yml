@@ -33,8 +33,6 @@ jobs:
       if: matrix.os != 'windows-latest'
     - name: Prepare build environment (Windows)
       uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 15.XX
     - name: Build (Windows)
       run: |
         cd groundstation-app
