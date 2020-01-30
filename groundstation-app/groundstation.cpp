@@ -29,7 +29,7 @@ void GroundStation::processInput() {
         QByteArray line;
         int newline_count = 0;
 
-        for (ssize_t i = 0; i < _inputBuffer.size(); i++) {
+        for (int i = 0; i < _inputBuffer.size(); i++) {
             char b = _inputBuffer.at(i);
 
             if (b == '\n') {
