@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.3.0
+      uses: jurplel/install-qt-action@v2.2.1
       with:
         # Additional Qt modules to install
         modules: qtserialport
