@@ -61,6 +61,6 @@ jobs:
         # File to upload to the release
         file: ${{ matrix.artifact }}
       env:
-        GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
-      if: github.event == 'release'
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      if: startsWith(github.ref, 'refs/tags/')
 
