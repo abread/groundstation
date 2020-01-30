@@ -14,14 +14,13 @@ DataWindow::DataWindow(GroundStation *g, QWidget *parent) :
     ui->setupUi(this);
 
     station->moveToThread(stationThread);
+    connect(stationThread, &QThread::started, station, &GroundStation::process);
+    connect(stationThread, &QThread::finished, station, &GroundStation::deleteLater);
+
     connect(station, &GroundStation::error, this, &DataWindow::showError);
     connect(station, &GroundStation::warning, this, &DataWindow::showWarning);
     connect(station, &GroundStation::dataReady, this, &DataWindow::pollData);
     connect(station, &GroundStation::rssiUpdate, this, &DataWindow::updateRSSI);
-    connect(stationThread, &QThread::started, station, &GroundStation::process);
-    connect(station, &GroundStation::finished, stationThread, &QThread::quit);
-    connect(station, &GroundStation::finished, station, &GroundStation::deleteLater);
-    connect(stationThread, &QThread::finished, stationThread, &QThread::deleteLater);
 
     connect(ui->checkBox, &QCheckBox::clicked, this, &DataWindow::setAutoscroll);
     connect(ui->pushButton_clear, &QPushButton::clicked, this, &DataWindow::clear);
@@ -71,5 +70,8 @@ void DataWindow::showWarning(QString msg) {
 
 DataWindow::~DataWindow()
 {
+    stationThread->quit();
+    stationThread->requestInterruption();
+    stationThread->wait(5000);
     delete ui;
 }

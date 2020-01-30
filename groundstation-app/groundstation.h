@@ -20,8 +20,6 @@ public:
     explicit GroundStation(QSerialPort* port, QFile* out, QObject *parent = nullptr);
     ~GroundStation();
 
-    void stop();
-
     int rssi();
     QList<DataLine> data();
 
@@ -39,7 +37,6 @@ private:
     void processInput();
     void pushData(QByteArray data);
     void setRSSI(int rssi);
-    bool shouldStop();
 
     QSerialPort *_port;
     QFile *_outputFile;
@@ -50,9 +47,6 @@ private:
 
     QList<DataLine> _outputBuffer;
     QMutex _outputBufferMutex;
-
-    bool _stop = false;
-    QMutex _stopMutex;
 };
 
 #endif // SERIALPORTREADER_H

@@ -1,4 +1,5 @@
 #include "groundstation.h"
+#include <QThread>
 
 GroundStation::GroundStation(QSerialPort* port, QFile *outputFile, QObject *parent) :
     QObject(parent),
@@ -7,17 +8,17 @@ GroundStation::GroundStation(QSerialPort* port, QFile *outputFile, QObject *pare
 {}
 
 void GroundStation::process() {
-    while (!shouldStop()) {
-        _port->waitForReadyRead();
+    forever {
+        if (QThread::currentThread()->isInterruptionRequested())
+            break;
+
+        _port->waitForReadyRead(1000);
         QByteArray data = _port->readAll();
         _inputBuffer.append(data);
         processInput();
     }
 
-    _port->close();
-    _outputFile->flush();
-    _outputFile->close();
-    emit finished();
+    _outputFile->flush(); // really make sure we flush all data
 }
 
 void GroundStation::processInput() {
@@ -63,11 +64,6 @@ void GroundStation::processInput() {
     } while(isLine);
 }
 
-bool GroundStation::shouldStop() {
-    QMutexLocker lock(&_stopMutex);
-    return _stop;
-}
-
 void GroundStation::pushData(QByteArray data) {
     DataLine l;
     l.ts = QDateTime::currentDateTime();
@@ -108,6 +104,10 @@ QList<DataLine> GroundStation::data() {
 }
 
 GroundStation::~GroundStation() {
+    _port->close();
+    _outputFile->flush();
+    _outputFile->close();
+
     delete _port;
     delete _outputFile;
 }
