@@ -1,0 +1,42 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build_app:
+    name: Builds and releases groundstation app for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            suffix: linux-amd64
+          - os: windows-latest
+            suffix: windows-amd64
+          - os: macOS-latest
+            suffix: macos
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.3.0
+      with:
+        # Additional Qt modules to install
+        modules: qtserialport
+    - name: Build
+      run: |
+        cd groundstation-app
+        qmake groundstation-app.pro
+        make qmake_all
+        make
+        mv groundstation-app groundstation-app-suffix-${{ matrix.suffix }}
+    - name: Release
+      uses: yakuhzi/action-release@v1.2.0
+      with:
+        # File to upload to the release
+        file: groundstation-app-${{ matrix.suffix }}
+      env:
+        GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
+      if: github.event == 'release'
+
