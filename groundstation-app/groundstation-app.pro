@@ -43,3 +43,14 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resources.qrc
+
+VERSION = $$system(git describe --tags)
+
+RC_ICONS = images/icon.ico
+
+ICON = images/icon.icns
+
+DISTFILES +=

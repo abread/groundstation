@@ -53,7 +53,16 @@ jobs:
     - name: Prepare artifacts (Linux)
       run: |
         mkdir dist
-        mv groundstation-app/groundstation-app dist/groundstation
+        cd groundstation-app
+        make install INSTALL_ROOT=AppDir
+        cd ..
+        wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+        wget -O linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+        chmod +x linuxdeploy
+        chmod +x *.AppImage
+        cd dist
+        cp ../groundstation-app/images/icon.svg ../grounstation-app.svg
+        ../linuxdeploy --appdir ../groundstation-app/AppDir -e ../groundstation-app/AppDir/opt/groundstation-app/bin/groundstation-app -i ../groundstation-app.svg --create-desktop-file --plugin qt -o appimage
       if: matrix.os == 'ubuntu-latest'
     - name: Copy license and readme
       run: |
