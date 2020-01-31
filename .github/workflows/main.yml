@@ -62,7 +62,7 @@ jobs:
         chmod +x linuxdeploy
         chmod +x *.AppImage
         cd dist
-        cp ../groundstation-app/images/icon.svg ../grounstation-app.svg
+        cp ../groundstation-app/images/icon.svg ../groundstation-app.svg
         ../linuxdeploy --appdir ../groundstation-app/AppDir -e ../groundstation-app/AppDir/opt/groundstation-app/bin/groundstation-app -i ../groundstation-app.svg --create-desktop-file --plugin qt -o appimage
       if: matrix.os == 'ubuntu-latest'
     - name: Copy license and readme
