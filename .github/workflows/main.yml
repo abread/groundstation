@@ -12,14 +12,11 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
           - os: ubuntu-latest
-            artifact_path: groundstation-app/groundstation-app
             artifact_name: groundstation-app-linux-amd64
           - os: windows-latest
-            artifact_path: groundstation-app/release/groundstation-app.exe
             artifact_name: groundstation-app-windows-msvc-amd64
           - os: macOS-latest
-            artifact_path: dist
-            artifact_name: groundstation-app-macos-amd64.zip
+            artifact_name: groundstation-app-macos-amd64
     steps:
     - uses: actions/checkout@v2
     - name: Install Qt
@@ -31,7 +28,6 @@ jobs:
       run: |
         cd groundstation-app
         qmake groundstation-app.pro
-        make qmake_all
         make
       if: matrix.os != 'windows-latest'
     - name: Prepare build environment (Windows)
@@ -42,13 +38,29 @@ jobs:
         qmake groundstation-app.pro -spec win32-msvc
         nmake
       if: matrix.os == 'windows-latest'
-    - name: Prepare artifact (macOS)
+    - name: Prepare artifacts (Windows)
       run: |
         mkdir dist
-        mv groundstation-app/groundstation-app.app dist/groundstation.app
+        mv .\groundstation-app\release\groundstation-app.exe .\dist\groundstation.exe
+        windeployqt .\dist\groundstation.exe
+      if: matrix.os == 'windows-latest'
+    - name: Prepare artifacts (macOS)
+      run: |
+        mkdir dist
+        mv groundstation-app/groundstation-app.app dist/Groundstation.app
+        macdeployqt dist/Groundstation.app
       if: matrix.os == 'macOS-latest'
+    - name: Prepare artifacts (Linux)
+      run: |
+        mkdir dist
+        mv groundstation-app/groundstation-app dist/groundstation
+      if: matrix.os == 'ubuntu-latest'
+    - name: Copy license and readme
+      run: |
+        cp LICENSE dist/
+        cp README.md dist/
     - name: Publish artifact
       uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.artifact_name }}
-        path: ${{ matrix.artifact_path }}
+        path: dist
