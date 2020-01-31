@@ -52,6 +52,7 @@ jobs:
       if: matrix.os == 'macOS-latest'
     - name: Prepare artifacts (Linux)
       run: |
+        sudo apt-get install -y libxkbcommon-x11-0
         mkdir dist
         cd groundstation-app
         make install INSTALL_ROOT=AppDir
