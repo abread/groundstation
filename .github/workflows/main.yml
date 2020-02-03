@@ -103,7 +103,7 @@ jobs:
         with:
           tag_name: ${{ steps.get_version.outputs.VERSION }
           release_name: Release ${{ steps.get_version.outputs.VERSION }}
-          body: TODO: write me
+          body: "TODO: write me"
           draft: true
       - name: Upload Linux release asset
         uses: actions/upload-release-asset@v1
