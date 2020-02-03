@@ -105,13 +105,21 @@ jobs:
           release_name: Release ${{ steps.get_version.outputs.VERSION }}
           body: "TODO: write me"
           draft: true
+      - name: Prepare assets
+        run: |
+          cd groundstation-app-linux-amd64-appimage
+          zip -r all.zip *
+          cd ../groundstation-app-windows-msvc-amd64
+          zip -r all.zip *
+          cd ../groundstation-app-macos-amd64
+          zip -r all.zip *
       - name: Upload Linux release asset
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./groundstation-app-linux-amd64-appimage.zip
+          asset_path: ./groundstation-app-linux-amd64-appimage/all.zip
           asset_name: groundstation-app-linux-amd64-appimage.zip
           asset_content_type: application/zip
       - name: Upload Windows release asset
@@ -120,7 +128,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./groundstation-app-windows-msvc-amd64.zip
+          asset_path: ./groundstation-app-windows-msvc-amd64/all.zip
           asset_name: groundstation-app-windows-msvc-amd64.zip
           asset_content_type: application/zip
       - name: Upload macOS release asset
@@ -129,6 +137,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./groundstation-app-macos-amd64.zip
+          asset_path: ./groundstation-app-macos-amd64/all.zip
           asset_name: groundstation-app-macos-amd64.zip
           asset_content_type: application/zip
