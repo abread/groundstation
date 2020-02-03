@@ -78,7 +78,7 @@ jobs:
     name: Creates GitHub release on tag
     needs: build_app
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'ref/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Get Linux artifact
         uses: actions/download-artifact@v1
