@@ -21,7 +21,7 @@ The code is built for an Arduino Nano Every board and the RFM69HCW transceiver, 
 ## Building the App
 Tested to work on Windows (MSVC, 64bit) and Linux (64bit).
 
-Precompiled versions are available for Windows, macOS and Linux. The Linux version does not include the shared libraries required to run the program, if you have a different Qt version installed, it may not work. Building from source is recommended.
+Precompiled versions are available for Windows, macOS (.app bundle) and Linux (AppImage). All of them include Qt shared libraries. If you don't want to/can't use them, build from source.
 
 If you're not comfortable building from source, [Qt Creator](https://www.qt.io/development-tools) is recommended.
 
