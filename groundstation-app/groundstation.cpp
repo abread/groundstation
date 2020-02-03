@@ -47,8 +47,8 @@ void GroundStation::processInput() {
         if (isLine) {
             _inputBuffer = _inputBuffer.right(_inputBuffer.length() - line.length());
             line.replace("\n\n", "\n");
+            line.chop(1); // remove \n
             if (line.startsWith("rssi: ")) {
-                line.chop(1); // remove \n
                 line = line.right(line.length() - 6);
                 setRSSI(line.toInt());
             } else {
