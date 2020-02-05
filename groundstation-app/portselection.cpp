@@ -84,7 +84,7 @@ void PortSelection::connect(QString portPath, QString outputPath) {
         return;
     }
 
-    port->setBaudRate(QSerialPort::Baud9600);
+    port->setBaudRate(QSerialPort::Baud115200);
     port->setDataBits(QSerialPort::Data8);
     port->setParity(QSerialPort::NoParity);
     port->setStopBits(QSerialPort::OneStop);
