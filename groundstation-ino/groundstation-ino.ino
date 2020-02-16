@@ -10,7 +10,7 @@
 #include <RFM69.h>
 #include <RFM69_ATC.h>
 
-RFM69_ATC radio;
+RFM69_ATC radio = RFM69_ATC(RADIO_SS_PIN, RADIO_IRQ_PIN);
 
 void write_data(uint8_t *data, size_t len) {
   Serial.print("data: ");
