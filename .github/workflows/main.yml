@@ -19,11 +19,18 @@ jobs:
             artifact_name: groundstation-app-macos-amd64
     steps:
     - uses: actions/checkout@v2
-    - name: Install Qt
+    - name: Install Qt (Win/Linux workaround)
       uses: ouuan/install-qt-action@v2.3.1 # temporary
       with:
         # Additional Qt modules to install
         modules: qtserialport
+      if: matrix.os != 'macos-latest' # temporary
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.3.0
+      with:
+        # Additional Qt modules to install
+        modules: qtserialport
+      if: matrix.os == 'macos-latest' # temporary
     - name: Build (*nix)
       run: |
         cd groundstation-app
