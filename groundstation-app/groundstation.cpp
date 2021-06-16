@@ -61,8 +61,8 @@ void GroundStation::processInput() {
             // normalize newlines
             line.replace("\n\n", "\n");
 
-            // remove trailing newline
-            line.chop(1);
+            // remove trailing CRLF
+            line.chop(2);
 
             handleMessage(line);
         }
