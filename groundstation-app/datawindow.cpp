@@ -19,7 +19,7 @@ DataWindow::DataWindow(GroundStation *g, QWidget *parent) :
 
     connect(station, &GroundStation::error, this, &DataWindow::showError);
     connect(station, &GroundStation::warning, this, &DataWindow::showWarning);
-    connect(station, &GroundStation::dataReady, this, &DataWindow::pollData);
+    connect(station, &GroundStation::dataReady, this, &DataWindow::recvData);
     connect(station, &GroundStation::rssiUpdate, this, &DataWindow::updateRSSI);
 
     connect(ui->checkBox, &QCheckBox::clicked, this, &DataWindow::setAutoscroll);
@@ -32,19 +32,15 @@ void DataWindow::updateRSSI(int rssi) {
     ui->label_rssi->setNum(rssi);
 }
 
-void DataWindow::pollData() {
-    QList<DataLine> data = station->data();
+void DataWindow::recvData(QByteArray msg) {
+    auto ts = QDateTime::currentDateTime();
 
-    for (const DataLine& d : data) {
-        ui->textEdit_data->insertHtml("<b>["+d.ts.toString("hh:mm:ss")+"]</b>&nbsp;");
-        ui->textEdit_data->insertPlainText(d.line);
-        ui->textEdit_data->insertHtml("<br>");
-        numRead++;
-        numShown++;
-    }
+    ui->textEdit_data->insertHtml("<b>["+ts.toString("hh:mm:ss")+"]</b>&nbsp;");
+    ui->textEdit_data->insertPlainText(msg);
+    ui->textEdit_data->insertHtml("<br>");
 
-    ui->label_numShown->setNum(numShown);
-    ui->label_numReceived->setNum(numRead);
+    ui->label_numShown->setNum(++numShown);
+    ui->label_numReceived->setNum(++numRead);
 
     if (_autoscroll) {
         ui->textEdit_data->ensureCursorVisible();

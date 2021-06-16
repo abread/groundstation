@@ -1,6 +1,9 @@
 #include "groundstation.h"
 #include <QThread>
 
+// actually it's probably something like 62, but let's leave it oversized
+#define MAX_MSG_SIZE 512
+
 GroundStation::GroundStation(QSerialPort* port, QFile *outputFile, QObject *parent) :
     QObject(parent),
     _port(port),
@@ -12,10 +15,18 @@ void GroundStation::process() {
         if (QThread::currentThread()->isInterruptionRequested())
             break;
 
-        _port->waitForReadyRead(1000);
-        QByteArray data = _port->readAll();
-        _inputBuffer.append(data);
-        processInput();
+        _port->waitForReadyRead(5000);
+        QByteArray data = _port->read(MAX_MSG_SIZE);
+        if (data.isEmpty()) {
+            if (_port->error() != QSerialPort::TimeoutError && _port->error() != QSerialPort::NoError) {
+                emit error("Erro de comunicação entre computador e estação base: " + _port->errorString());
+                _port->clearError();
+            }
+        } else {
+            _inputBuffer.append(data);
+            processInput();
+        }
+
     }
 
     _outputFile->flush(); // really make sure we flush all data
@@ -46,39 +57,42 @@ void GroundStation::processInput() {
 
         if (isLine) {
             _inputBuffer = _inputBuffer.right(_inputBuffer.length() - line.length());
-            line.replace("\n\n", "\n");
-            line.chop(1); // remove \n
-            if (line.startsWith("rssi: ")) {
-                line = line.right(line.length() - 6);
-                setRSSI(line.toInt());
-            } else {
-                if (line.startsWith("data: ")) {
-                    line = line.right(line.length() - 6);
-                } else {
-                    emit warning("Erro de comunicação com transceiver da estação base. Dados erróneos guardados em bruto.");
-                }
 
-                pushData(line);
-            }
+            // normalize newlines
+            line.replace("\n\n", "\n");
+
+            // remove trailing newline
+            line.chop(1);
+
+            handleMessage(line);
         }
     } while(isLine);
+
+    if (_inputBuffer.size() > 2*MAX_MSG_SIZE) {
+        // just assume it's all one message, and probably error out
+        handleMessage(_inputBuffer);
+
+        // clear the buffer
+        _inputBuffer.clear();
+    }
 }
 
-void GroundStation::pushData(QByteArray data) {
-    DataLine l;
-    l.ts = QDateTime::currentDateTime();
-    l.line = data;
+void GroundStation::handleMessage(QByteArray msg) {
+    if (msg.startsWith("rssi: ")) {
+        msg = msg.right(msg.length() - 6);
+        setRSSI(msg.toInt());
+    } else if (msg.startsWith("data: ")) {
+        msg = msg.right(msg.length() - 6);
 
-    if (_outputFile->write(data) == -1) {
-        emit error("Falha a escrever dados em ficheiro de saída: "+data);
+        if (_outputFile->write(msg) == -1) {
+            emit error("Falha a escrever dados em ficheiro de saída: " + msg);
+        }
+        _outputFile->flush();
+
+        emit dataReady(msg);
+    } else {
+        emit error("Erro de comunicação com transceiver da estação base: mensagem inválida recebida. Isto NÃO é problema do CanSat, é quase de certeza culpa do criador deste programa. Dados="+msg);
     }
-    _outputFile->flush();
-
-    _outputBufferMutex.lock();
-    _outputBuffer.append(l);
-    _outputBufferMutex.unlock();
-
-    emit dataReady();
 }
 
 void GroundStation::setRSSI(int rssi) {
@@ -92,15 +106,6 @@ void GroundStation::setRSSI(int rssi) {
 int GroundStation::rssi() {
     QMutexLocker lock(&_rssiMutex);
     return _rssi;
-}
-
-QList<DataLine> GroundStation::data() {
-    QMutexLocker lock(&_outputBufferMutex);
-
-    QList<DataLine> out;
-    _outputBuffer.swap(out);
-
-    return out;
 }
 
 GroundStation::~GroundStation() {

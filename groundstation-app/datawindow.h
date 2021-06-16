@@ -25,7 +25,7 @@ private slots:
     void showWarning(QString msg);
     void showError(QString msg);
     void updateRSSI(int rssi);
-    void pollData();
+    void recvData(QByteArray msg);
 
 private:
     Ui::DataWindow *ui;

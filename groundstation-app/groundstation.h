@@ -8,11 +8,6 @@
 #include <QDateTime>
 #include <QMutex>
 
-struct DataLine {
-    QByteArray line;
-    QDateTime ts;
-};
-
 class GroundStation : public QObject
 {
     Q_OBJECT
@@ -21,21 +16,20 @@ public:
     ~GroundStation();
 
     int rssi();
-    QList<DataLine> data();
 
 public slots:
     void process();
 
 signals:
     void rssiUpdate(int rssi);
-    void dataReady();
+    void dataReady(QByteArray l);
     void error(QString msg);
     void warning(QString msg);
     void finished();
 
 private:
     void processInput();
-    void pushData(QByteArray data);
+    void handleMessage(QByteArray msg);
     void setRSSI(int rssi);
 
     QSerialPort *_port;
@@ -44,9 +38,6 @@ private:
 
     int _rssi;
     QMutex _rssiMutex;
-
-    QList<DataLine> _outputBuffer;
-    QMutex _outputBufferMutex;
 };
 
 #endif // SERIALPORTREADER_H
