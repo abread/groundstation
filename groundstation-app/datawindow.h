@@ -28,6 +28,9 @@ private slots:
     void recvData(QByteArray msg);
 
 private:
+    void showMsg(const char *tag, QByteArray msg);
+    inline void showMsg(const char *tag, QString msg) { showMsg(tag, msg.toUtf8()); }
+
     Ui::DataWindow *ui;
     GroundStation *station;
     QThread *stationThread;

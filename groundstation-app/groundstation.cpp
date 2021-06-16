@@ -69,6 +69,8 @@ void GroundStation::processInput() {
     } while(isLine);
 
     if (_inputBuffer.size() > 2*MAX_MSG_SIZE) {
+        emit warning("Problema na comunicação entre computador e estação base: mensagem demasiado grande. Os dados atuais serão interpretados como se fossem uma mensagem completa, o que provavelmente vai causar um erro. ESTE PROBLEMA NÃO É DO CANSAT");
+
         // just assume it's all one message, and probably error out
         handleMessage(_inputBuffer);
 

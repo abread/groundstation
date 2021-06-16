@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QPushButton>
+#include <QDebug>
 
 DataWindow::DataWindow(GroundStation *g, QWidget *parent) :
     QMainWindow(parent),
@@ -33,11 +34,7 @@ void DataWindow::updateRSSI(int rssi) {
 }
 
 void DataWindow::recvData(QByteArray msg) {
-    auto ts = QDateTime::currentDateTime();
-
-    ui->textEdit_data->insertHtml("<b>["+ts.toString("hh:mm:ss")+"]</b>&nbsp;");
-    ui->textEdit_data->insertPlainText(msg);
-    ui->textEdit_data->insertHtml("<br>");
+    showMsg("DADOS", msg);
 
     ui->label_numShown->setNum(++numShown);
     ui->label_numReceived->setNum(++numRead);
@@ -57,11 +54,45 @@ void DataWindow::setAutoscroll(bool a) {
 }
 
 void DataWindow::showError(QString msg) {
-    QMessageBox::critical(this, "ERRO", msg);
+    showMsg("ERRO", msg);
+    //QMessageBox::critical(this, "ERRO", msg);
 }
 
 void DataWindow::showWarning(QString msg) {
-    QMessageBox::warning(this, "Aviso", msg);
+    showMsg("AVISO", msg);
+    //QMessageBox::warning(this, "Aviso", msg);
+}
+
+void DataWindow::showMsg(const char *tag, QByteArray msg) {
+    auto ts = QDateTime::currentDateTime();
+    auto color = "black";
+    if (QString::compare(tag, "AVISO") == 0) {
+        color = "orange";
+    } else if (QString::compare(tag, "ERRO") == 0) {
+        color = "red";
+    }
+
+    QString start = "";
+    start += "<b style=\"color:";
+    start += color;
+    start += ";\">[";
+    start += ts.toString("hh:mm:ss");
+    start += ' ';
+    start += tag;
+    start += "]</b>&nbsp;";
+    ui->textEdit_data->insertHtml(start);
+    ui->textEdit_data->insertPlainText(msg);
+
+    if (QString::compare(tag, "DADOS") == 0 && msg.back() != '\n') {
+        ui->textEdit_data->insertHtml("&nbsp;<b>[sem fim de linha]</b>");
+    }
+
+    ui->textEdit_data->insertHtml("<br>");
+
+    qDebug() << '[' << ts.toString("hh:mm:ss") << ' ' << tag << "] "
+             << msg
+             << ((QString::compare(tag, "DADOS") == 0 && msg.back() != '\n') ? "[sem fim de linha]" : "")
+             << '\n';
 }
 
 DataWindow::~DataWindow()
@@ -69,5 +100,6 @@ DataWindow::~DataWindow()
     stationThread->quit();
     stationThread->requestInterruption();
     stationThread->wait(5000);
+
     delete ui;
 }
