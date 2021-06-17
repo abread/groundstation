@@ -77,7 +77,7 @@ void PortSelection::connect(QString portPath, QString outputPath) {
     QSerialPort *port = new QSerialPort(portPath, this);
     QFile *outputFile = new QFile(outputPath, this);
 
-    if (!outputFile->open(QFile::Append)) {
+    if (!outputFile->open(QFile::WriteOnly | QFile::Append)) {
         QMessageBox::critical(this, "Erro fatal", "Erro ao abrir ficheiro de saída: "+outputFile->errorString());
         delete outputFile;
         delete port;
