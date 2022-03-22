@@ -3,6 +3,7 @@
 
 #include "datawindow.h"
 #include <QMainWindow>
+#include <QFile>
 
 namespace Ui {
 class PortSelection;
@@ -19,8 +20,6 @@ public:
 private slots:
     void on_pushButton_refresh_clicked();
 
-    void on_toolButton_fileSelect_clicked();
-
     void on_pushButton_connect_clicked();
 
 private:
@@ -29,8 +28,8 @@ private:
 
     void init_defaults();
     void refreshPortList();
-    void pickOutputFile();
-    void connect(QString port, QString outputPath);
+    QFile* pickOutputFile();
+    void connect(QString port, QFile *outputFile);
 };
 
 #endif // PORTSELECTION_H

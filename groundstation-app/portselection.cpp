@@ -17,9 +17,6 @@ PortSelection::PortSelection(QWidget *parent) :
 
 void PortSelection::init_defaults() {
     refreshPortList();
-
-    QDateTime now = QDateTime::currentDateTimeUtc();
-    ui->lineEdit_outputFilePath->setText("dados_cansat_"+now.toString("yyyy-MM-dd_hh:mm")+".csv");
 }
 
 void PortSelection::refreshPortList() {
@@ -45,44 +42,49 @@ void PortSelection::refreshPortList() {
 
     ui->comboBox_port->setEnabled(true);
 }
-void PortSelection::pickOutputFile() {
-    ui->lineEdit_outputFilePath->setEnabled(false);
+QFile* PortSelection::pickOutputFile() {
+    QString path;
 
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setWindowTitle("Salvar dados em");
+    while (true) {
+        QFileDialog dialog(this);
+        dialog.setFileMode(QFileDialog::AnyFile);
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setWindowTitle("Salvar dados em");
 
-    QStringList filters;
-    filters << "text/csv"
-            << "text/plain"
-            << "application/octet-stream";
-    dialog.setMimeTypeFilters(filters);
-    dialog.selectMimeTypeFilter("text/csv");
-    dialog.setDefaultSuffix(".csv");
+        QStringList filters;
+        filters << "text/csv"
+                << "text/plain"
+                << "application/octet-stream";
+        dialog.setMimeTypeFilters(filters);
+        dialog.selectMimeTypeFilter("text/csv");
+        dialog.setDefaultSuffix(".csv");
 
-    if (dialog.exec()) {
-        QStringList files = dialog.selectedFiles();
-        if (files.length() == 1) {
-            ui->lineEdit_outputFilePath->setText(files.first());
+        if (dialog.exec()) {
+            QStringList files = dialog.selectedFiles();
+            if (files.length() == 1) {
+                path = files.first();
+                break;
+            } else {
+                QMessageBox::warning(this, "Ficheiro de Saída Inválido", "Escolha exatamente um ficheiro de saída.");
+            }
+        } else {
+            // cancelled
+            return nullptr;
         }
     }
 
-    ui->lineEdit_outputFilePath->setEnabled(true);
-}
-
-void PortSelection::connect(QString portPath, QString outputPath) {
-    this->hide();
-
-    QSerialPort *port = new QSerialPort(portPath, this);
-    QFile *outputFile = new QFile(outputPath, this);
-
+    QFile *outputFile = new QFile(path, this);
     if (!outputFile->open(QFile::WriteOnly | QFile::Append)) {
         QMessageBox::critical(this, "Erro fatal", "Erro ao abrir ficheiro de saída: "+outputFile->errorString());
         delete outputFile;
-        delete port;
-        return;
+        return nullptr;
     }
+
+    return outputFile;
+}
+
+void PortSelection::connect(QString portPath, QFile *outputFile) {
+    QSerialPort *port = new QSerialPort(portPath, this);
 
     port->setBaudRate(QSerialPort::Baud115200);
     port->setDataBits(QSerialPort::Data8);
@@ -96,6 +98,8 @@ void PortSelection::connect(QString portPath, QString outputPath) {
         delete port;
         return;
     }
+
+    this->hide();
 
     GroundStation *g = new GroundStation(port, outputFile);
     port->setParent(g);
@@ -121,11 +125,6 @@ void PortSelection::on_pushButton_refresh_clicked()
     refreshPortList();
 }
 
-void PortSelection::on_toolButton_fileSelect_clicked()
-{
-    pickOutputFile();
-}
-
 void PortSelection::on_pushButton_connect_clicked()
 {
     QVariant port = ui->comboBox_port->currentData();
@@ -134,11 +133,7 @@ void PortSelection::on_pushButton_connect_clicked()
         return;
     }
 
-    QString outputPath = ui->lineEdit_outputFilePath->text();
-    if (outputPath.length() == 0) {
-        QMessageBox::warning(this, "Ficheiro de saída inválido", "Escolhe um ficheiro para guardar os dados.");
-        return;
-    }
+    QFile *outputFile = this->pickOutputFile();
 
-    connect(port.toString(), outputPath);
+    connect(port.toString(), outputFile);
 }
