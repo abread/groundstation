@@ -1,8 +1,8 @@
 // !!!CORRIGIR FREQUÊNCIA!!!
-#define RADIO_FREQUENCY 433000000 // Hz
+#define RADIO_FREQUENCY 433000000 /* Hz */
 
 #define RADIO_SS_PIN 10
-#define RADIO_IRQ_PIN 5
+#define RADIO_IRQ_PIN 3
 #define RADIO_NET_ID 100 // 0-255, must be the same on all nodes
 #define RADIO_NODE_ID 1 // 0-254, must be unique in network, 255=broadcast
 #define RADIO_ATC_RSSI -80
