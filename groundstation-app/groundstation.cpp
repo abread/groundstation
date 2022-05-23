@@ -93,7 +93,7 @@ void GroundStation::handleMessage(QByteArray msg) {
 
         emit dataReady(msg);
     } else {
-        emit error("Erro de comunicação com transceiver da estação base: mensagem inválida recebida. Isto NÃO é problema do CanSat, é quase de certeza culpa do criador deste programa. Dados="+msg);
+        emit error("Erro de comunicação com transceiver da estação base: mensagem inválida recebida. Confirme que está a tentar ligar-se à estação base e não ao CanSat, e que a estação base tem o seu programa carregado (e não o do CanSat). Dados="+msg);
     }
 }
 
