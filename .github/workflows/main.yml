@@ -43,7 +43,7 @@ jobs:
       run: |
         mkdir dist
         mv .\groundstation-app\release\groundstation-app.exe .\dist\groundstation.exe
-        windeployqt --verbose 2 .\dist\groundstation.exe
+        windeployqt --no-translations .\dist\groundstation.exe
       if: matrix.os == 'windows-latest'
     - name: Prepare artifacts (macOS)
       run: |
