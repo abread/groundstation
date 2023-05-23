@@ -15,7 +15,7 @@ void GroundStation::process() {
         if (QThread::currentThread()->isInterruptionRequested())
             break;
 
-        _port->waitForReadyRead(1500);
+        _port->waitForReadyRead(500);
         QByteArray data = _port->read(MAX_MSG_SIZE);
         if (data.isEmpty()) {
             if (_port->error() != QSerialPort::TimeoutError && _port->error() != QSerialPort::NoError) {
