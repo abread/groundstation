@@ -86,14 +86,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: groundstation-app-linux-amd64-appimage
+          path: groundstation-app-linux-amd64-appimage
       - name: Get Windows artifact
         uses: actions/download-artifact@v3
         with:
           name: groundstation-app-windows-msvc-amd64
+          path: groundstation-app-windows-msvc-amd64
       - name: Get macOS artifact
         uses: actions/download-artifact@v3
         with:
           name: groundstation-app-macos-amd64
+          path: groundstation-app-macos-amd64
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
