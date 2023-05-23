@@ -33,10 +33,6 @@ void PortSelection::refreshPortList() {
         desc.append(port_info.manufacturer());
         desc.append(")");
 
-        if (port_info.isBusy()) {
-            desc.append(" [JÁ EM USO POR OUTRO PROGRAMA]");
-        }
-
         ui->comboBox_port->addItem(desc, QVariant(port_info.systemLocation()));
     }
 

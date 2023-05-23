@@ -24,6 +24,7 @@ jobs:
       with:
         # Additional Qt modules to install
         modules: qtserialport
+        version: 6.5.*
     - name: Build (*nix)
       run: |
         cd groundstation-app
