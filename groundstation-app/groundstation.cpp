@@ -4,11 +4,6 @@
 // actually it's probably something like 62, but let's leave it oversized
 #define MAX_MSG_SIZE 512
 
-// Packets are usually small and we don't want reception to be delayed
-// The data rate shouldn't be so high that the overhead is too big to keep up
-// max packet size is 61, with rssi and protocol overhead this means a 82-byte read at most
-#define READ_SIZE 82
-
 GroundStation::GroundStation(QSerialPort* port, QFile *outputFile, QObject *parent) :
     QObject(parent),
     _port(port),
@@ -20,8 +15,8 @@ void GroundStation::process() {
         if (QThread::currentThread()->isInterruptionRequested())
             break;
 
-        _port->waitForReadyRead(5000);
-        QByteArray data = _port->read(READ_SIZE);
+        _port->waitForReadyRead(1500);
+        QByteArray data = _port->read(MAX_MSG_SIZE);
         if (data.isEmpty()) {
             if (_port->error() != QSerialPort::TimeoutError && _port->error() != QSerialPort::NoError) {
                 emit error("Erro de comunicação entre computador e estação base: " + _port->errorString());

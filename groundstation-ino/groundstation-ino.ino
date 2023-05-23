@@ -32,6 +32,8 @@ void write_rssi(int rssi) {
   Serial.println(rssi);
 }
 
+unsigned long lastUpdate;
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -43,8 +45,9 @@ void setup() {
   radio.enableAutoPower(RADIO_ATC_RSSI);
   radio.setFrequency(RADIO_FREQUENCY);
 
-  delay(1000);
   digitalWrite(LED_BUILTIN, LOW);
+  write_rssi(-999);
+  lastUpdate = millis();
 }
 
 void loop() {
@@ -58,5 +61,9 @@ void loop() {
       radio.sendACK();
     }
     digitalWrite(LED_BUILTIN, LOW);
+    lastUpdate = millis();
+  } else if (millis() - lastUpdate > 1400) {
+      write_rssi(-999);
+      lastUpdate = millis();
   }
 }
