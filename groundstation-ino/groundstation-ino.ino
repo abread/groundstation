@@ -62,7 +62,7 @@ void loop() {
     }
     digitalWrite(LED_BUILTIN, LOW);
     lastUpdate = millis();
-  } else if (millis() - lastUpdate > 1400) {
+  } else if (millis() - lastUpdate > 1500) {
       write_rssi(-999);
       lastUpdate = millis();
   }
