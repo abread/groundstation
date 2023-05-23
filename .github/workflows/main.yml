@@ -43,7 +43,7 @@ jobs:
       run: |
         mkdir dist
         mv .\groundstation-app\release\groundstation-app.exe .\dist\groundstation.exe
-        windeployqt .\dist\groundstation.exe
+        windeployqt --verbose 2 .\dist\groundstation.exe
       if: matrix.os == 'windows-latest'
     - name: Prepare artifacts (macOS)
       run: |
@@ -53,7 +53,7 @@ jobs:
       if: matrix.os == 'macOS-latest'
     - name: Prepare artifacts (Linux)
       run: |
-        sudo apt-get install -y libxkbcommon-x11-0 libqt5gui5 libfuse2
+        sudo apt-get install -y libxkbcommon-x11-0 libxcb-cursor0 libfuse2
         mkdir dist
         cd groundstation-app
         make install INSTALL_ROOT=AppDir
