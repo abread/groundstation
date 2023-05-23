@@ -6,7 +6,8 @@
 
 // Packets are usually small and we don't want reception to be delayed
 // The data rate shouldn't be so high that the overhead is too big to keep up
-#define READ_SIZE 16
+// max packet size is 61, with rssi and protocol overhead this means a 82-byte read at most
+#define READ_SIZE 82
 
 GroundStation::GroundStation(QSerialPort* port, QFile *outputFile, QObject *parent) :
     QObject(parent),
