@@ -18,9 +18,9 @@ jobs:
           - os: macOS-latest
             artifact_name: groundstation-app-macos-amd64
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.13.2
+      uses: jurplel/install-qt-action@v3.2.1
       with:
         # Additional Qt modules to install
         modules: qtserialport
@@ -31,7 +31,7 @@ jobs:
         make
       if: matrix.os != 'windows-latest'
     - name: Prepare build environment (Windows)
-      uses: ilammy/msvc-dev-cmd@v1.9.0
+      uses: ilammy/msvc-dev-cmd@v1.12.1
     - name: Build (Windows)
       run: |
         cd groundstation-app
@@ -70,7 +70,7 @@ jobs:
         cp LICENSE dist/
         cp README.md dist/
     - name: Publish artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.artifact_name }}
         path: dist
@@ -80,75 +80,35 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Get Linux artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: groundstation-app-linux-amd64-appimage
       - name: Get Windows artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: groundstation-app-windows-msvc-amd64
       - name: Get macOS artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: groundstation-app-macos-amd64
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
-          release_name: Release ${{ steps.get_version.outputs.VERSION }}
-          body: "TODO: write me"
-          draft: true
       - name: Prepare assets
         run: |
-          cd groundstation-app-linux-amd64-appimage
-          zip -r all.zip *
-          cd ../groundstation-app-windows-msvc-amd64
-          zip -r all.zip *
-          cd ../groundstation-app-macos-amd64
-          zip -r all.zip *
-          cd ..
+          zip -r groundstation-app-linux-amd64-appimage.zip groundstation-app-linux-amd64-appimage
+          zip -r groundstation-app-windows-msvc-amd64.zip groundstation-app-windows-msvc-amd64
+          zip -r groundstation-app-macos-amd64.zip groundstation-app-macos-amd64
           zip -r groundstation-arduino-code.zip groundstation-ino
-      - name: Upload Linux release asset
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create release
+        id: create_release
+        uses: marvinpinto/action-automatic-releases@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./groundstation-app-linux-amd64-appimage/all.zip
-          asset_name: groundstation-app-linux-amd64-appimage.zip
-          asset_content_type: application/zip
-      - name: Upload Windows release asset
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./groundstation-app-windows-msvc-amd64/all.zip
-          asset_name: groundstation-app-windows-msvc-amd64.zip
-          asset_content_type: application/zip
-      - name: Upload macOS release asset
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./groundstation-app-macos-amd64/all.zip
-          asset_name: groundstation-app-macos-amd64.zip
-          asset_content_type: application/zip
-      - name: Upload Arduino code asset
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./groundstation-arduino-code.zip
-          asset_name: groundstation-arduino-code.zip
-          asset_content_type: application/zip
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ steps.get_version.outputs.VERSION }}
+          title: Release ${{ steps.get_version.outputs.VERSION }}
+          draft: true
+          files: |
+            *.zip
