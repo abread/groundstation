@@ -82,7 +82,7 @@ QFile* PortSelection::pickOutputFile() {
 void PortSelection::connect(QString portPath, QFile *outputFile) {
     QSerialPort *port = new QSerialPort(portPath, this);
 
-    port->setBaudRate(QSerialPort::Baud115200);
+    port->setBaudRate(QSerialPort::Baud19200);
     port->setDataBits(QSerialPort::Data8);
     port->setParity(QSerialPort::NoParity);
     port->setStopBits(QSerialPort::OneStop);

@@ -38,7 +38,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
 
-  Serial.begin(115200);
+  Serial.begin(19200);
   radio.initialize(RF69_433MHZ, RADIO_NODE_ID, RADIO_NET_ID);
   radio.setHighPower();
   radio.encrypt(null);
