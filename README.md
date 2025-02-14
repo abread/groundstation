@@ -1,5 +1,5 @@
 # Groundstation
-Software for a CanSat groundstation, developed for usage on the CanSat Júnior 2020 competition.
+Software for a CanSat groundstation, developed for usage on the CanSat Júnior kit.
 If you have received this in an already compiled format, you may find the source code in https://github.com/abread/groundstation
 
 The project is divided in two parts: the desktop app and the transceiver code.
