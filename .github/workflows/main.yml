@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3.2.1
+      uses: jurplel/install-qt-action@v4.2.1
       with:
         # Additional Qt modules to install
         modules: qtserialport
@@ -32,7 +32,7 @@ jobs:
         make
       if: matrix.os != 'windows-latest'
     - name: Prepare build environment (Windows)
-      uses: ilammy/msvc-dev-cmd@v1.12.1
+      uses: ilammy/msvc-dev-cmd@v1.13.0
     - name: Build (Windows)
       run: |
         cd groundstation-app
@@ -71,7 +71,7 @@ jobs:
         cp LICENSE dist/
         cp README.md dist/
     - name: Publish artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4.6.2
       with:
         name: ${{ matrix.artifact_name }}
         path: dist
@@ -83,17 +83,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Get Linux artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.3.0
         with:
           name: groundstation-app-linux-amd64-appimage
           path: groundstation-app-linux-amd64-appimage
       - name: Get Windows artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.3.0
         with:
           name: groundstation-app-windows-msvc-amd64
           path: groundstation-app-windows-msvc-amd64
       - name: Get macOS artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.3.0
         with:
           name: groundstation-app-macos-amd64
           path: groundstation-app-macos-amd64
