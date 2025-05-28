@@ -66,7 +66,10 @@ OutFiles PortSelection::pickOutputFile() {
             }
         } else {
             // cancelled
-            return OutFiles{.out=nullptr,.log=nullptr};
+            OutFiles ret;
+            ret.out = nullptr;
+            ret.log = nullptr;
+            return ret;
         }
     }
 
@@ -86,7 +89,10 @@ OutFiles PortSelection::pickOutputFile() {
         logFile = nullptr;
     }
 
-    return OutFiles{.out=outputFile,.log=logFile};
+    OutFiles ret;
+    ret.out = outputFile;
+    ret.log = logFile;
+    return ret;
 }
 
 void PortSelection::connect(QString portPath, OutFiles files) {
