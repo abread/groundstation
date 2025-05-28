@@ -4,11 +4,17 @@
 // actually it's probably something like 62, but let's leave it oversized
 #define MAX_MSG_SIZE 512
 
-GroundStation::GroundStation(QSerialPort* port, QFile *outputFile, QObject *parent) :
+GroundStation::GroundStation(QSerialPort* port, QFile *outputFile, QFile *logFile, QObject *parent) :
     QObject(parent),
     _port(port),
-    _outputFile(outputFile)
-{}
+    _outputFile(outputFile),
+    _logFile(logFile)
+{
+    if (_logFile->write("timestamp;rssi;msg...") == -1) {
+        emit error("Falha a escrever cabeçalho no registo de execução.");
+    }
+    _logFile->flush();
+}
 
 void GroundStation::process() {
     forever {
@@ -29,7 +35,9 @@ void GroundStation::process() {
 
     }
 
-    _outputFile->flush(); // really make sure we flush all data
+    // really make sure we flush all data
+    _outputFile->flush();
+    _logFile->flush();
 }
 
 void GroundStation::processInput() {
@@ -85,6 +93,18 @@ void GroundStation::handleMessage(QByteArray msg) {
         setRSSI(msg.toInt());
     } else if (msg.startsWith("data: ")) {
         msg = msg.right(msg.length() - 6);
+
+        QString logMsgPrologue;
+        logMsgPrologue.append(QString::number(QDateTime::currentMSecsSinceEpoch()));
+        logMsgPrologue.append(';');
+        logMsgPrologue.append(QString::number(this->rssi()));
+        logMsgPrologue.append(';');
+        QByteArray logMsgPrologueBytes = logMsgPrologue.toUtf8();
+
+        if (_logFile->write(logMsgPrologueBytes) == -1 || _logFile->write(msg) == -1 || _logFile->write("\n") == -1) {
+            emit error("Falha a escrever dados em registo de execução");
+        }
+        _logFile->flush();
 
         if (_outputFile->write(msg) == -1) {
             emit error("Falha a escrever dados em ficheiro de saída: " + msg);

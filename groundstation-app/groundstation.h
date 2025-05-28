@@ -12,7 +12,7 @@ class GroundStation : public QObject
 {
     Q_OBJECT
 public:
-    explicit GroundStation(QSerialPort* port, QFile* out, QObject *parent = nullptr);
+    explicit GroundStation(QSerialPort* port, QFile* out, QFile* log, QObject *parent = nullptr);
     ~GroundStation();
 
     int rssi();
@@ -34,6 +34,7 @@ private:
 
     QSerialPort *_port;
     QFile *_outputFile;
+    QFile *_logFile;
     QByteArray _inputBuffer;
 
     int _rssi;

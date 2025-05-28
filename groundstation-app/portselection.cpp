@@ -38,7 +38,8 @@ void PortSelection::refreshPortList() {
 
     ui->comboBox_port->setEnabled(true);
 }
-QFile* PortSelection::pickOutputFile() {
+
+OutFiles PortSelection::pickOutputFile() {
     QString path;
 
     while (true) {
@@ -65,7 +66,7 @@ QFile* PortSelection::pickOutputFile() {
             }
         } else {
             // cancelled
-            return nullptr;
+            return OutFiles{.out=nullptr,.log=nullptr};
         }
     }
 
@@ -73,14 +74,26 @@ QFile* PortSelection::pickOutputFile() {
     if (!outputFile->open(QFile::WriteOnly | QFile::Append)) {
         QMessageBox::critical(this, "Erro fatal", "Erro ao abrir ficheiro de saída: "+outputFile->errorString());
         delete outputFile;
-        return nullptr;
+        outputFile = nullptr;
     }
 
-    return outputFile;
+    QString logPath = path;
+    logPath.append(".log");
+    QFile* logFile = new QFile(logPath, this);
+    if (!logFile->open(QFile::WriteOnly | QFile::Append)) {
+        QMessageBox::critical(this, "Erro fatal", "Erro ao abrir ficheiro de registo de saída: "+logFile->errorString());
+        delete logFile;
+        logFile = nullptr;
+    }
+
+    return OutFiles{.out=outputFile,.log=logFile};
 }
 
-void PortSelection::connect(QString portPath, QFile *outputFile) {
+void PortSelection::connect(QString portPath, OutFiles files) {
     QSerialPort *port = new QSerialPort(portPath, this);
+
+    QFile *outputFile = files.out;
+    QFile *logFile = files.log;
 
     port->setBaudRate(QSerialPort::Baud19200);
     port->setDataBits(QSerialPort::Data8);
@@ -97,11 +110,13 @@ void PortSelection::connect(QString portPath, QFile *outputFile) {
 
     this->hide();
 
-    GroundStation *g = new GroundStation(port, outputFile);
+    GroundStation *g = new GroundStation(port, outputFile, logFile);
     port->setParent(g);
     outputFile->setParent(g);
+    logFile->setParent(g);
     port = nullptr;
     outputFile = nullptr;
+    logFile = nullptr;
 
     dataWindow = new DataWindow(g);
     g->setParent(dataWindow);
@@ -129,7 +144,7 @@ void PortSelection::on_pushButton_connect_clicked()
         return;
     }
 
-    QFile *outputFile = this->pickOutputFile();
+    OutFiles files = this->pickOutputFile();
 
-    connect(port.toString(), outputFile);
+    connect(port.toString(), files);
 }

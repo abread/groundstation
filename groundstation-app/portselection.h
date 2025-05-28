@@ -9,6 +9,11 @@ namespace Ui {
 class PortSelection;
 }
 
+struct OutFiles {
+    QFile* out;
+    QFile* log;
+};
+
 class PortSelection : public QMainWindow
 {
     Q_OBJECT
@@ -28,8 +33,8 @@ private:
 
     void init_defaults();
     void refreshPortList();
-    QFile* pickOutputFile();
-    void connect(QString port, QFile *outputFile);
+    OutFiles pickOutputFile();
+    void connect(QString port, OutFiles files);
 };
 
 #endif // PORTSELECTION_H
