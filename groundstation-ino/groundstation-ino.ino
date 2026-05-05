@@ -1,5 +1,6 @@
 // !!!CORRIGIR FREQUÊNCIA!!!
 #define RADIO_FREQUENCY 433000000 /* Hz */
+#define CJKIT_VERSION 2
 
 #define RADIO_SS_PIN 10
 #define RADIO_IRQ_PIN 3
@@ -39,6 +40,11 @@ void setup() {
   digitalWrite(LED_BUILTIN, HIGH);
 
   Serial.begin(19200);
+#if CJKIT_VERSION == 2
+  // v2 kit's level shifter requires a slower SPI bus (still way faster than
+  // anything we would transmit).
+  SPI.setClockDivider(SPI_CLOCK_DIV16);
+#endif
   radio.initialize(RF69_433MHZ, RADIO_NODE_ID, RADIO_NET_ID);
   radio.setHighPower();
   radio.encrypt(null);
